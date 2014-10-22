@@ -10,7 +10,7 @@ module RestrictedAccess
       desc "Creates a RestrictedAccess initializer."
 
       def copy_initializer
-        template "restricted_access.rb", "config/initializers/restricted_access.rb"
+        template "restricted_access.erb", "config/initializers/restricted_access.rb"
       end
 
       private
