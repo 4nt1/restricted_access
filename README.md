@@ -18,7 +18,17 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+The gem is currently working only with Mongoid & Devise.
+You need to add the "mongoid-enum" gem to your gemfile, and include the module in the concerned model.
+
+Generate this initializer with
+```
+rails g restricted_access:install model_name --levels=level1 level2 level3 --controller_scope=your_scope
+```
+
+model_name is the name of the model concerned with the access restriction.
+Give the available levels of access to the --levels options
+Give your controllers scope name to the --controller_scope options (default: nil)
 
 ## Contributing
 

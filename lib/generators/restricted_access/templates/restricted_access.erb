@@ -1,6 +1,6 @@
 RestrictedAccess.configure do |config|
 
-  config.access = [<% @levels.each_with_index do |level, index| %>
+  config.accesses = [<% @levels.each_with_index do |level, index| %>
                     { level:  :<%= level %>,
                       label:  '',
                       power:  <%= index %> }<% if index + 1 < @levels.count %>,<%- end %>
