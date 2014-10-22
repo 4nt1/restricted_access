@@ -1,6 +1,6 @@
 # RestrictedAccess
 
-TODO: Write a gem description
+An access rights management tool intended to work with [Devise](https://github.com/plataformatec/devise)
 
 ## Installation
 
