@@ -6,7 +6,7 @@ An access rights management tool intended to work with [Devise](https://github.c
 
 Add this line to your application's Gemfile:
 
-    gem 'restricted_access'
+    gem 'restricted_access', git: 'https://github.com/4nt1/restricted_access'
 
 And then execute:
 

@@ -27,6 +27,10 @@ module RestrictedAccess
       @resource ||= configuration.resource
     end
 
+    def controller_scope
+      @controller_scope ||= configuration.controller_scope
+    end
+
     def define_dynamic_methods
       # on Access class
       accesses.map(&:level).each do |level|
@@ -37,6 +41,10 @@ module RestrictedAccess
         RestrictedAccess::Controller.class_eval do
           define_method "prevent_#{level}_access" do
             restrict_access if send("current_#{RestrictedAccess.resource}").access <= RestrictedAccess::Access.send(level)
+          end
+
+          define_method :restrict_access do
+            redirect_to send("#{RestrictedAccess.controller_scope}_root_path"), notice: 'You do not have access to this page' and return
           end
         end
       end
