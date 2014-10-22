@@ -134,6 +134,7 @@ end
 Every inherited controller has now a few more methods:
 
 * `:restrict_access`, which redirect to the `#{controller_scope}_root_path`. Set controller_scope to nil if you just want to redirect to root_path.
+
 * `:prevent_#{level}_access`, which calls `:restrict_access` if the `:current_#{resource_name}` doesn't have enough access right. If you use Devise, you already have a `:current_#{resource_name}` method, if you don't use Devise, just implement it.
 
 ```ruby
@@ -144,6 +145,13 @@ end
 ```
 
 ### RestrictedAccess::Helper
+
+```ruby
+module Backoffice::AdminHelper
+  include RestrictedAccess::Helper
+end
+```
+
 
 If you provided a `config.resource` option, you can include the `RestrictedAccess::Helper` in one of your helpers.
 
