@@ -1,6 +1,6 @@
 # RestrictedAccess
 
-An access rights management tool intended to work with [Devise](https://github.com/plataformatec/devise)
+An access rights management tool.
 
 ## Installation
 
@@ -18,17 +18,110 @@ Or install it yourself as:
 
 ## Usage
 
-The gem is currently working only with Mongoid & Devise.
-You need to add the "mongoid-enum" gem to your gemfile, and include the module in the concerned model.
+The gem is currently working only with Mongoid.
+
+It depends on [Devise](https://github.com/plataformatec/devise) & [mongoid-enum](https://github.com/thetron/mongoid-enum).
+
 
 Generate this initializer with
 ```
-rails g restricted_access:install model_name --levels=level1 level2 level3 --controller_scope=your_scope
+rails g restricted_access:install admin --levels=mini normal super --controller_scope=backoffice
 ```
 
 model_name is the name of the model concerned with the access restriction.
+
 Give the available levels of access to the --levels options
+
 Give your controllers scope name to the --controller_scope options (default: nil)
+
+This will generate the restricted_access.rb initializer
+
+```ruby
+RestrictedAccess.configure do |config|
+
+  config.accesses  = [ {  level:  :mini,
+                          label:  'Some description for this access level',
+                          power:  0 },
+                        { level: :normal,
+                          label: 'Some description for this access level',
+                          power: 1 },
+                        { level: :super,
+                          label: 'Some description for this access level',
+                          power:  2}
+                      ]
+  config.resource = :admin
+  config.controller_scope = :backoffice
+
+end
+```
+
+You can customize the accesses with a label (optional) and define different power (the higher has more rights).
+
+The `config.resource` and `config.controller_scope` are useful only in Rails, defining some methods in controllers and helpers (see below).
+
+### RestrictedAccess::Model
+
+Include the RestrictedAccess::Model module in your related model
+
+```ruby
+class Admin
+  include Mongoid::Document
+  include RestrictedAccess::Model
+
+end
+```
+
+The module enhances the model with some methods and attributes.
+
+Every model has now a :level attribute (Symbol type), by default the first defined in your initializer. You can set it like any attributes.
+
+```ruby
+admin = Admin.first
+admin.update(level: :super)
+
+admin2 = Admin.last
+admin.update(level: :mini)
+```
+
+The level defines its access rights.
+
+Each instance has a `:access` method, returning a `RestrictedAccess::Access` instance.
+
+```ruby
+admin.access
+=> #<RestrictedAccess::Access:0x007fc255d36098 @level=:super, @label="", @power=2>
+
+```
+
+The `RestrictedAccess::Access` class include comparable, so you can do such things :
+
+```ruby
+admin.access > admin2.access
+=> true
+
+RestrictedAccess.accesses.max
+=> #<RestrictedAccess::Access:0x007fc255d36098 @level=:super, @label="", @power=2>
+
+```
+
+Thanks to the [mongoid-enum](https://github.com/thetron/mongoid-enum) gem, some methods to check rights.
+
+```ruby
+admin.mini?
+=> false
+
+admin.super?
+=> true
+
+Admin::LEVEL
+=> [:mini, :normal, :super]
+
+# scopes
+Admin.mini # => Mongoid::Criteria
+Admin.super # => Mongoid::Criteria
+```
+
+
 
 ## Contributing
 
