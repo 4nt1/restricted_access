@@ -11,8 +11,8 @@ module RestrictedAccess
 
       def set_variable
         @levels           = levels
-        @resource_name    = resource_name
-        @controller_scope = controller_scope
+        @resource_name    = options.resource_name
+        @controller_scope = options.controller_scope
       end
 
       def copy_initializer
