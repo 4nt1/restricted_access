@@ -3,6 +3,7 @@ module RestrictedAccess
     extend ActiveSupport::Concern
 
     included do |base|
+      include Mongoid::Enum
       enum :level,                    RestrictedAccess.accesses.map(&:level)
     end
 
