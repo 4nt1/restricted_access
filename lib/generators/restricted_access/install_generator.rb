@@ -9,18 +9,15 @@ module RestrictedAccess
 
       desc "Creates a RestrictedAccess initializer."
 
+      def set_variable
+        @levels           = levels
+        @resource_name    = resource_name
+        @controller_scope = controller_scope
+      end
+
       def copy_initializer
         template "restricted_access.erb", "config/initializers/restricted_access.rb"
       end
-
-      private
-        def controller_scope
-          options.controller_scope
-        end
-
-        def controller_scope
-          options.resource_name
-        end
 
     end
   end
