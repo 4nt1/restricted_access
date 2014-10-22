@@ -121,6 +121,44 @@ Admin.mini # => Mongoid::Criteria
 Admin.super # => Mongoid::Criteria
 ```
 
+### RestrictedAccess::Controller
+
+If you provided a `config.resource` and `config.controller_scope` in the initializer you can include the `RestrictedAccess::Controller` in your controller.
+
+```ruby
+class Backoffice::BaseController < ApplicationController
+  include RestrictedAccess::Controller
+end
+```
+
+Every inherited controller has now a few more methods:
+
+* `:restrict_access`, which redirect to the `#{controller_scope}_root_path`. Set controller_scope to nil if you just want to redirect to root_path.
+* `:prevent_#{level}_access`, which calls `:restrict_access` if the `:current_#{resource_name}` doesn't have enough access right. If you use Devise, you already have a `:current_#{resource_name}` method, if you don't use Devise, just implement it.
+
+```ruby
+class Backoffice::AdminsController < Backoffice::BaseController
+  before_action :prevent_normal_access,  except: [:index]
+  # mini & normal admins will only be able to access index view
+end
+```
+
+### RestrictedAccess::Helper
+
+If you provided a `config.resource` option, you can include the `RestrictedAccess::Helper` in one of your helpers.
+
+It provides a `:available_for` method in the views, allowing you to hide some part of the view.
+
+```html
+<!-- this div won't be seen be admins lower than super -->
+<%= available_for :super do %>
+  <div>
+    I have something to hide here.
+  </div>
+<%- end %>
+```
+
+
 
 
 ## Contributing

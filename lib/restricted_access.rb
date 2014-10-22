@@ -44,7 +44,8 @@ module RestrictedAccess
           end
 
           define_method :restrict_access do
-            redirect_to send("#{RestrictedAccess.controller_scope}_root_path"), notice: 'You do not have access to this page' and return
+            _scope = RestrictedAccess.controller_scope.present? ? "#{RestrictedAccess.controller_scope}_" : nil
+            redirect_to send("#{_scope}root_path"), notice: 'You do not have access to this page' and return
           end
         end
       end
