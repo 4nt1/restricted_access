@@ -1,3 +1,4 @@
+require "mongoid/enum"
 require "restricted_access/version"
 require 'restricted_access/configuration'
 require 'restricted_access/access'
