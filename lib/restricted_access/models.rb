@@ -4,30 +4,40 @@ module RestrictedAccess
 
     module ClassMethods
 
-      attr_reader :levels
+      attr_reader :accesses
 
-      def access_levels(levels)
-        @levels = levels.map { |k, v| Access.new(k, v) }
+      def access_levels(accesses)
+        @accesses = accesses.map { |k, v| Access.new(k, v) }
+
+        # define level store field
         if defined?(Mongoid::Document)
-          enum :level, levels.keys
+          enum :level, accesses.keys
         elsif defined?(ActiveRecord::Base)
-          enum :level, levels
+          enum level: accesses
         else
           raise 'Your ORM is not recognized.'
         end
+
+        # define class method to get accesses
+        @accesses.map(&:level).each do |level|
+          define_singleton_method level do
+            @accesses.find { |a| a.level == level }
+          end
+        end
+
       end
 
       def access(level_name)
-        @levels.find { |a| a.level == level_name }
+        @accesses.find { |a| a.level == level_name }
       end
     end
 
     def access
-      self.class.levels.find { |a| a.level == level }
+      self.class.accesses.find { |a| a.level == level.to_sym }
     end
 
     def authorized_accesses
-      self.class.levels.select { |a| a <= access }
+      self.class.accesses.select { |a| a <= access }
     end
 
   end

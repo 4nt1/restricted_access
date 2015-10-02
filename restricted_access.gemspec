@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = RestrictedAccess::VERSION
   spec.authors       = ["4nt1"]
   spec.email         = ["antoinemary@hotmail.fr"]
-  spec.summary       = %q{An access rights management tool intended to work with Devise}
-  spec.description   = %q{An access rights management tool intended to work with Devise}
+  spec.summary       = %q{An access rights management tool}
+  spec.description   = %q{An access rights management tool. Define routes and part of views that can be accessed by resources.}
   spec.homepage      = "https://github.com/4nt1/restricted_access"
   spec.license       = "MIT"
 
