@@ -1,7 +1,5 @@
 module RestrictedAccess
   class Configuration
-    attr_accessor :accesses
-    attr_accessor :resource
-    attr_accessor :controller_scope
+    attr_accessor :resources
   end
 end

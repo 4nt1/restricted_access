@@ -1,6 +1,6 @@
-module RestrictedAccess
-  module Controller
+# module RestrictedAccess
+#   module Controller
 
-  end
+#   end
 
-end
+# end
