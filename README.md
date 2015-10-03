@@ -48,11 +48,13 @@ class Admin
   include Mongoid::Document
   access_levels mini: 0, normal: 1, super: 2
 end
-``
+```
 
 The module enhances the model with some methods and attributes.
 
-Every model has now a :level attribute, by default the first defined by the class method. You can set it like any attributes.
+Every model has now a :level attribute, by default the first defined by the class method.
+
+You can set it like any attributes.
 
 ```ruby
 admin = Admin.first
@@ -108,7 +110,7 @@ Controllers inheriting from ApplicationController have now a few more methods:
 
 * `:prevent_#{level}_#{resource_name}_access`, which calls `:restrict_#{current_resource.level}_#{resource_name}_access` if the `:current_#{resource_name}` doesn't have enough access right.
 
-If you use Devise, you already have a `:current_#{resource_name}` method, if you don't use Devise, just implement it.
+If you use Devise, you already have a `:current_#{resource_name}` method, if you don't use Devise, just implement the method.
 
 ```ruby
 class FrontController < ApplicationController
@@ -144,7 +146,7 @@ You can also define a more global `:restrict_#{resource_name}_access` method whi
 class FrontController < ApplicationController
 
   private
-    # this method as a bigger precedency than the other
+    # this method as a bigger precedency than the other one
     def restrict_admin_access
       redirect_to some_path, notice: 'Nope dude' and return
     end
