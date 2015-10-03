@@ -6,7 +6,7 @@ An access rights management tool.
 
 Add this line to your application's Gemfile:
 
-    gem 'restricted_access', git: 'https://github.com/4nt1/restricted_access'
+    gem 'restricted_access'
 
 And then execute:
 
@@ -16,64 +16,43 @@ Or install it yourself as:
 
     $ gem install restricted_access
 
+## Previous version of the README (for version 0.0.2)
+
+can be found [here](https://github.com/4nt1/restricted_access/blob/develop/README-v0.0.2.md)
+
 ## Usage
 
-The gem is currently working only with Mongoid.
+Generate the config file with the generator, pass the resources as an argument.
 
-It depends on [Devise](https://github.com/plataformatec/devise) & [mongoid-enum](https://github.com/thetron/mongoid-enum).
-
-
-Generate this initializer with
 ```
-rails g restricted_access:install admin --levels=mini normal super --controller_scope=backoffice
+  rails g restricted_access:install -r user admin
 ```
 
-model_name is the name of the model concerned with the access restriction.
+## Mongoid support
 
-Give the available levels of access to the --levels options
+You need the `'mongoid-enum'` gem if you use mongoid.
+Just ad it to your gemfile.
 
-Give your controllers scope name to the --controller_scope options (default: nil)
-
-This will generate the restricted_access.rb initializer
-
-```ruby
-RestrictedAccess.configure do |config|
-
-  config.accesses  = [ {  level:  :mini,
-                          label:  'Some description for this access level',
-                          power:  0 },
-                        { level: :normal,
-                          label: 'Some description for this access level',
-                          power: 1 },
-                        { level: :super,
-                          label: 'Some description for this access level',
-                          power:  2}
-                      ]
-  config.resource = :admin
-  config.controller_scope = :backoffice
-
-end
+```
+gem 'mongoid-enum'
 ```
 
-You can customize the accesses with a label (optional) and define different power (the higher has more rights).
+I didn't ship it as a dependency as it's useless for active_record users, and I didn't want to copy/paste some nice code done by someone else.
 
-The `config.resource` and `config.controller_scope` are useful only in Rails, defining some methods in controllers and helpers (see below).
+### Models
 
-### RestrictedAccess::Model
-
-Include the RestrictedAccess::Model module in your related model
+You must define the different levels of accesses in your model.
 
 ```ruby
 class Admin
   include Mongoid::Document
-  include RestrictedAccess::Model
-
+  access_levels mini: 0, normal: 1, super: 2
 end
-```
+``
 
 The module enhances the model with some methods and attributes.
 
-Every model has now a :level attribute (Symbol type), by default the first defined in your initializer. You can set it like any attributes.
+Every model has now a :level attribute, by default the first defined by the class method. You can set it like any attributes.
 
 ```ruby
 admin = Admin.first
@@ -89,7 +68,7 @@ Each instance has a `:access` method, returning a `RestrictedAccess::Access` ins
 
 ```ruby
 admin.access
-=> #<RestrictedAccess::Access:0x007fc255d36098 @level=:super, @label="", @power=2>
+=> #<RestrictedAccess::Access:0x007fc255d36098 @level=:super, @power=2>
 
 ```
 
@@ -100,9 +79,11 @@ admin.access > admin2.access
 => true
 
 RestrictedAccess.accesses.max
-=> #<RestrictedAccess::Access:0x007fc255d36098 @level=:super, @label="", @power=2>
+=> #<RestrictedAccess::Access:0x007fc255d36098 @level=:super, @power=2>
 
 ```
+
+## Mongoid users
 
 Thanks to the [mongoid-enum](https://github.com/thetron/mongoid-enum) gem, some methods to check rights.
 
@@ -121,45 +102,66 @@ Admin.mini # => Mongoid::Criteria
 Admin.super # => Mongoid::Criteria
 ```
 
-### RestrictedAccess::Controller
+### Controllers
 
-If you provided a `config.resource` and `config.controller_scope` in the initializer you can include the `RestrictedAccess::Controller` in your controller.
+Controllers inheriting from ApplicationController have now a few more methods:
 
-```ruby
-class Backoffice::BaseController < ApplicationController
-  include RestrictedAccess::Controller
-end
-```
+* `:prevent_#{level}_#{resource_name}_access`, which calls `:restrict_#{current_resource.level}_#{resource_name}_access` if the `:current_#{resource_name}` doesn't have enough access right.
 
-Every inherited controller has now a few more methods:
-
-* `:restrict_access`, which redirect to the `#{controller_scope}_root_path`. Set controller_scope to nil if you just want to redirect to root_path.
-
-* `:prevent_#{level}_access`, which calls `:restrict_access` if the `:current_#{resource_name}` doesn't have enough access right. If you use Devise, you already have a `:current_#{resource_name}` method, if you don't use Devise, just implement it.
+If you use Devise, you already have a `:current_#{resource_name}` method, if you don't use Devise, just implement it.
 
 ```ruby
-class Backoffice::AdminsController < Backoffice::BaseController
-  before_action :prevent_normal_access,  except: [:index]
+class FrontController < ApplicationController
+  before_action :prevent_normal_admin_access,  except: [:index]
   # mini & normal admins will only be able to access index view
 end
 ```
 
-### RestrictedAccess::Helper
+* `:restrict_#{level}_#{resource_name}_access` which redirect to the `root_path`.
+
+You can override the method in your controller to do something else.
 
 ```ruby
-module Backoffice::AdminHelper
-  include RestrictedAccess::Helper
+class FrontController < ApplicationController
+  before_action :prevent_normal_admin_access,  except: [:index]
+  # Some code ...
+
+  private
+
+    def restrict_mini_admin_access
+      redirect_to some_path, notice: 'Nope dude' and return
+    end
+
+    def restrict_normal_admin_access
+      redirect_to some_other_path, notice: 'Nope dude' and return
+    end
 end
 ```
 
+You can also define a more global `:restrict_#{resource_name}_access` method which applies to all concerned resources.
 
-If you provided a `config.resource` option, you can include the `RestrictedAccess::Helper` in one of your helpers.
+```ruby
+class FrontController < ApplicationController
 
-It provides a `:available_for` method in the views, allowing you to hide some part of the view.
+  private
+    # this method as a bigger precedency than the other
+    def restrict_admin_access
+      redirect_to some_path, notice: 'Nope dude' and return
+    end
+
+    def restrict_normal_admin_access
+      redirect_to some_other_path, notice: 'Nope dude' and return
+    end
+end
+```
+
+### Helpers
+
+The gem provides a `:available_for` method in the views, allowing you to hide some part of the view.
 
 ```html
 <!-- this div won't be seen be admins lower than super -->
-<%= available_for :super do %>
+<%= available_for :super, :admin do %>
   <div>
     I have something to hide here.
   </div>
@@ -171,7 +173,7 @@ It provides a `:available_for` method in the views, allowing you to hide some pa
 
 ## Contributing
 
-1. Fork it ( http://github.com/<my-github-username>/restricted_access/fork )
+1. Fork it ( http://github.com/4nt1/restricted_access/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)

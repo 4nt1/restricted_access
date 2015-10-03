@@ -1,19 +1,14 @@
+require 'rails/generators/base'
+require 'securerandom'
 module RestrictedAccess
   module Generators
-    class InstallGenerator < Rails::Generators::NamedBase
-      include Rails::Generators::ResourceHelpers
+    class InstallGenerator < Rails::Generators::Base
       source_root File.expand_path('../templates', __FILE__)
-      argument      :resource_name,     type: :string,  default: 'user'
-      class_option  :levels,            type: :array,   default: ['normal', 'super'],   desc: "List of the differents access levels"
-      class_option  :controller_scope,  type: :string,                                  desc: "Scope of the concerned controllers"
 
       desc "Creates a RestrictedAccess initializer."
+      class_option :orm
 
-      def set_variable
-        @levels           = options.levels
-        @resource_name    = resource_name
-        @controller_scope = options.controller_scope
-      end
+      class_option  :resources,            type: :array,   desc: "List of the differents resources", aliases: '-r'
 
       def copy_initializer
         template "restricted_access.erb", "config/initializers/restricted_access.rb"

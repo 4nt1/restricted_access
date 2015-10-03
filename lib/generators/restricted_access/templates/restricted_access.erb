@@ -1,18 +1,4 @@
-RestrictedAccess.configure do |config|
-
-  config.accesses = [<% @levels.each_with_index do |level, index| %>
-                    { level:  :<%= level %>,
-                      label:  '',
-                      power:  <%= index %> }<% if index + 1 < @levels.count %>,<%- end %>
-                  <%- end %>
-                  ]
-
-  config.resource = :<%= @resource_name %>
-
-<% if @controller_scope %>
-  config.controller_scope = :<%= @controller_scope %>
-<% else %>
-config.controller_scope = nil
-<%- end %>
-
+RestrictedAccess.configure do |conf|
+  require 'restricted_access/orm/<%= options[:orm] %>'
+  conf.resources = <%= options[:resources].map { |r| r.downcase.singularize.to_sym } %>
 end

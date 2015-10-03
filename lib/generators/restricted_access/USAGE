@@ -3,7 +3,7 @@ Description:
     Generate the initializer.
 
 Example:
-    rails g restricted_access:install admin --levels=mini super mega --controller_scope=backoffice
+    rails g restricted_access:install
 
     This will create:
         app/config/initializers/restricted_access.rb
