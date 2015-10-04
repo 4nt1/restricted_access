@@ -2,8 +2,8 @@ module RestrictedAccess
   module Controller
 
     RestrictedAccess.resources.each do |resource_name|
-      klass = resource_name.to_s.classify.constantize
-      if klass.accesses.present?
+      klass = resource_name.to_s.classify.constantize rescue nil
+      if klass && klass.accesses.present?
         klass.accesses.each do |access|
 
           define_method "prevent_#{access.level}_#{resource_name}_access" do
