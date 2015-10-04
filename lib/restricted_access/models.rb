@@ -18,13 +18,6 @@ module RestrictedAccess
           raise 'Your ORM is not recognized.'
         end
 
-        # define class method to get accesses
-        @accesses.map(&:level).each do |level|
-          define_singleton_method level do
-            @accesses.find { |a| a.level == level }
-          end
-        end
-
       end
 
       def access(level_name)
@@ -33,7 +26,7 @@ module RestrictedAccess
     end
 
     def access
-      self.class.accesses.find { |a| a.level == level.to_sym }
+      self.class.access(level.to_sym)
     end
 
     def authorized_accesses

@@ -28,6 +28,24 @@ Generate the config file with the generator, pass the resources as an argument.
   rails g restricted_access:install -r user admin
 ```
 
+## Active Record
+
+You have to run a migration to add the `:level` field to your model.
+
+```
+$ rails g migration AddLevelToAdmin
+```
+You can edit it this way :
+
+```ruby
+class AddLevelToAdmins < ActiveRecord::Migration
+  def change
+    add_column :admins, :level, :integer
+  end
+end
+
+```
+
 ## Mongoid support
 
 You need the `'mongoid-enum'` gem if you use mongoid.
@@ -84,10 +102,7 @@ RestrictedAccess.accesses.max
 => #<RestrictedAccess::Access:0x007fc255d36098 @level=:super, @power=2>
 
 ```
-
-## Mongoid users
-
-Thanks to the [mongoid-enum](https://github.com/thetron/mongoid-enum) gem, some methods to check rights.
+As the `:level` attribute is an enum, you get this kind of methods :
 
 ```ruby
 admin.mini?
@@ -96,12 +111,10 @@ admin.mini?
 admin.super?
 => true
 
-Admin::LEVEL
-=> [:mini, :normal, :super]
-
 # scopes
-Admin.mini # => Mongoid::Criteria
-Admin.super # => Mongoid::Criteria
+Admin.mini # =>     Mongoid::Criteria
+# or
+Admin.super # => => ActiveRecord::Relation
 ```
 
 ### Controllers
