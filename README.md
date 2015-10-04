@@ -48,7 +48,7 @@ end
 
 ## Mongoid support
 
-You need the `'mongoid-enum'` gem if you use mongoid.
+You need the [mongoid-enum](https://github.com/thetron/mongoid-enum) gem if you use mongoid.
 Just ad it to your gemfile.
 
 ```
@@ -98,7 +98,7 @@ The `RestrictedAccess::Access` class include comparable, so you can do such thin
 admin.access > admin2.access
 => true
 
-RestrictedAccess.accesses.max
+Admin.accesses.max
 => #<RestrictedAccess::Access:0x007fc255d36098 @level=:super, @power=2>
 
 ```
@@ -114,7 +114,7 @@ admin.super?
 # scopes
 Admin.mini # =>     Mongoid::Criteria
 # or
-Admin.super # => => ActiveRecord::Relation
+Admin.super # =>    ActiveRecord::Relation
 ```
 
 ### Controllers
