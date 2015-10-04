@@ -28,6 +28,15 @@ Generate the config file with the generator, pass the resources as an argument.
   rails g restricted_access:install -r user admin
 ```
 
+```ruby
+# config/initializers/restricted_access.rb
+RestrictedAccess.configure do |conf|
+  require 'restricted_access/orm/mongoid'
+  # require 'restricted_access/orm/active_record'
+  conf.resources = [:user, :admin]
+end
+```
+
 ## Active Record
 
 You have to run a migration to add the `:level` field to your model.
